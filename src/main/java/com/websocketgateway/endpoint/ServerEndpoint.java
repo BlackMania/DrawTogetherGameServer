@@ -28,8 +28,7 @@ public class ServerEndpoint {
             int response = handler.verifyUserToken(token).getResponseCode();
             if(response != HttpURLConnection.HTTP_OK)
             {
-                System.out.printf(response + "\n");
-                session.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT, "Token is invalid"));
+                session.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT,  String.format("Couldn't accept token. Responsecode: %s", response)));
                 return;
             }
         }
@@ -66,6 +65,7 @@ public class ServerEndpoint {
             try {
                 task = EMessage.valueOf(json.get("task").toString());
                 ClientMessageContextHandler.processMessage(task, json);
+                System.out.printf("[Message Processed] %s | %s | %s \n", session.getId(), message, timestamp.toString());
             }
             catch (Exception exc)
             {
