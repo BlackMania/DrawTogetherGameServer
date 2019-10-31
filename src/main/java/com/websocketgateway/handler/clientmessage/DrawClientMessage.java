@@ -4,7 +4,7 @@ import org.json.JSONObject;
 
 public class DrawClientMessage implements ClientMessageHandler {
     @Override
-    public void processMessage(JSONObject jsonObject) {
-        System.out.printf("processed: " + jsonObject.toString());
+    public void processMessage(JSONObject jsonObject)
+    {
     }
 }
