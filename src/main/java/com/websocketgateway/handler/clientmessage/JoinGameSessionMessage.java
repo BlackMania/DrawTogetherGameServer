@@ -40,21 +40,39 @@ public class JoinGameSessionMessage implements ClientMessageHandler {
     public void updateMessage(Session session) {
         SessionCollection sessionCollection = SessionCollection.getInstance();
         try {
-            GameSession gameSession = sessionCollection.getGameSessionBy(session);
+            GameSession gameSession = sessionCollection.getGameSessionByClientSession(session);
             // ToDo
             // Create a state for the game to check whether the game has started, or is still waiting for players
             // If waiting for players, send players only
             // If game has started, send players, drawingcoord and other stuff on playerjoin
             for(Player player : gameSession.getPlayers())
             {
-                if(session != player.getSession())
+                JSONObject jsonObject;
+                if(gameSession.isStarted())
                 {
-                    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                    player.getSession().getBasicRemote().sendText("A new player has joined!");
-                    System.out.printf("[Clients Updated]  %s \n", timestamp.toString());
-                } else
+                    jsonObject = new JSONObject();
+                    if(session != player.getSession())
+                    {
+                        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                        player.getSession().getBasicRemote().sendText("A new player has joined!");
+                        System.out.printf("[Clients Updated]  %s \n", timestamp.toString());
+                    } else
+                    {
+                        player.getSession().getBasicRemote().sendText("You joined the gamesession");
+                    }
+                }
+                else
                 {
-                    player.getSession().getBasicRemote().sendText("You joined the gamesession");
+                    jsonObject = new JSONObject();
+                    if(session != player.getSession())
+                    {
+                        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                        player.getSession().getBasicRemote().sendText("A new player has joined!");
+                        System.out.printf("[Clients Updated]  %s \n", timestamp.toString());
+                    } else
+                    {
+                        player.getSession().getBasicRemote().sendText("You joined the gamesession");
+                    }
                 }
             }
         }

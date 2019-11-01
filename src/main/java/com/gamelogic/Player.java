@@ -15,6 +15,7 @@ public class Player {
         drawer = false;
     }
 
+    //region Getters and setters
     public void setPoints(int points) {
         this.points = points;
     }
@@ -42,4 +43,7 @@ public class Player {
     public String getNickname() {
         return nickname;
     }
+    //endregion
+
+
 }

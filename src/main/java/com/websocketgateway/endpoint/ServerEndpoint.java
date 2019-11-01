@@ -1,5 +1,6 @@
 package com.websocketgateway.endpoint;
 
+import com.gamelogic.GameSession;
 import com.gamelogic.SessionCollection;
 import com.websocketgateway.handler.APIHandler;
 import com.websocketgateway.handler.clientmessage.ClientMessageContextHandler;
@@ -77,9 +78,16 @@ public class ServerEndpoint {
     @OnClose
     public void onClose(Session session, CloseReason reason)
     {
-        SessionCollection sessionCollection = SessionCollection.getInstance();
-
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        SessionCollection sessionCollection = SessionCollection.getInstance();
+        try {
+            GameSession gameSession = sessionCollection.getGameSessionByClientSession(session);
+            gameSession.removePlayer(session);
+        }
+        catch(Exception exc)
+        {
+            System.out.printf("[Removing Client from GameSession exited with error] %s | %s | %s \n", session.getId(), exc.getMessage(), timestamp.toString());
+        }
         System.out.printf("[Connection closed] %s | %s | %s \n", session.getId(), reason.getCloseCode() + " - " + reason.getReasonPhrase(), timestamp.toString());
         sessions.remove(session);
     }

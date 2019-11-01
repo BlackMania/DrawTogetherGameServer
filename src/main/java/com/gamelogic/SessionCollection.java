@@ -22,17 +22,6 @@ public class SessionCollection {
         return sessionCollection;
     }
 
-    public GameSession getGameSession(String gameSessionId) throws Exception {
-        for(GameSession gameSession : gameSessions)
-        {
-            if(gameSession.getSessionId().equals(gameSessionId))
-            {
-                return gameSession;
-            }
-        }
-        throw new Exception("Gamesession doesn't exist or is no longer active");
-    }
-
     public GameSession getSessionByHostId(String hostId) throws Exception{
         for(GameSession gameSession : gameSessions) {
             if (gameSession.getHostId().equals(hostId)) {
@@ -40,6 +29,16 @@ public class SessionCollection {
             }
         }
         throw new Exception("Gamesession doesn't exist or is no longer active");
+    }
+
+    public GameSession getGameSessionByClientSession(Session session) throws Exception
+    {
+        for(GameSession gameSession : gameSessions)
+        {
+            if(gameSession.checkIfPlayerIsInHere(session))
+                return gameSession;
+        }
+        throw new Exception("Player is not in a game session");
     }
 
     public GameSession getLastGameSession() {
@@ -51,12 +50,12 @@ public class SessionCollection {
     }
 
     public void joinGameSession(Player player, String gameSessionId) throws Exception{
-        if(checkIfPlayerIsAlreadyInGame(player.getSession())) throw new Exception("You are already in a game");
+        if(alreadyInGame(player.getSession())) throw new Exception("You are already in a game");
         for(GameSession gameSession : gameSessions)
         {
             if(gameSession.getSessionId().equals(gameSessionId))
             {
-                if(gameSession.canJoinSession())
+                if(gameSession.isNotFull())
                 {
                     gameSession.addPlayer(player);
                 }
@@ -66,17 +65,7 @@ public class SessionCollection {
         }
     }
 
-    public GameSession getGameSessionBy(Session session) throws Exception
-    {
-        for(GameSession gameSession : gameSessions)
-        {
-            if(gameSession.checkIfPlayerIsInHere(session))
-                return gameSession;
-        }
-        throw new Exception("Player is not in a game session");
-    }
-
-    private boolean checkIfPlayerIsAlreadyInGame(Session session)
+    private boolean alreadyInGame(Session session)
     {
         for(GameSession gameSession : gameSessions)
         {

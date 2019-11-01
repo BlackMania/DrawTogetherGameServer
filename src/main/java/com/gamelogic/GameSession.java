@@ -10,13 +10,19 @@ public class GameSession {
     private String hostId;
     private List<Player> players;
     private final int MAX_PLAYERS = 6;
+    private Chat chat;
+    private Drawing drawing;
+    private boolean started;
 
     public GameSession(String hostId) {
         sessionId = UUID.randomUUID().toString();
         this.hostId = hostId;
         players = new ArrayList<Player>();
+        chat = new Chat();
+        started = false;
     }
 
+    //region f and setter
     public String getSessionId() {
         return sessionId;
     }
@@ -25,9 +31,23 @@ public class GameSession {
         return hostId;
     }
 
+    public List<Player> getPlayers() {
+        return players;
+    }
+
     public void addPlayer(Player player) {
         players.add(player);
     }
+
+    public boolean isStarted() {
+        return started;
+    }
+
+    public void setStarted(boolean started) {
+        this.started = started;
+    }
+
+    //endregion
 
     public void removePlayer(Session session)
     {
@@ -45,7 +65,7 @@ public class GameSession {
         }
     }
 
-    public boolean canJoinSession(){
+    public boolean isNotFull(){
         return players.size() != MAX_PLAYERS;
     }
     public boolean checkIfPlayerIsInHere(Session session)
@@ -58,7 +78,4 @@ public class GameSession {
         return false;
     }
 
-    public List<Player> getPlayers() {
-        return players;
-    }
 }
