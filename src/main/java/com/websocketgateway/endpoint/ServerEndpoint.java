@@ -1,5 +1,6 @@
 package com.websocketgateway.endpoint;
 
+import com.gamelogic.SessionCollection;
 import com.websocketgateway.handler.APIHandler;
 import com.websocketgateway.handler.clientmessage.ClientMessageContextHandler;
 import com.websocketgateway.handler.clientmessage.EMessage;
@@ -60,12 +61,11 @@ public class ServerEndpoint {
         }
         if(json != null)
         {
-            System.out.printf("[Processing Message] %s | %s | %s \n", session.getId(), message, timestamp.toString());
+            System.out.printf("[Processing Message] %s | Executing task: %s | %s \n", session.getId(), json.get("task"), timestamp.toString());
             EMessage task = null;
             try {
                 task = EMessage.valueOf(json.get("task").toString());
-                ClientMessageContextHandler.processMessage(task, json);
-                System.out.printf("[Message Processed] %s | %s | %s \n", session.getId(), message, timestamp.toString());
+                ClientMessageContextHandler.processMessage(task, json, session);
             }
             catch (Exception exc)
             {
@@ -77,6 +77,8 @@ public class ServerEndpoint {
     @OnClose
     public void onClose(Session session, CloseReason reason)
     {
+        SessionCollection sessionCollection = SessionCollection.getInstance();
+
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         System.out.printf("[Connection closed] %s | %s | %s \n", session.getId(), reason.getCloseCode() + " - " + reason.getReasonPhrase(), timestamp.toString());
         sessions.remove(session);
