@@ -51,18 +51,23 @@ public class SessionCollection {
 
     public void joinGameSession(Player player, String gameSessionId) throws Exception{
         if(alreadyInGame(player.getSession())) throw new Exception("You are already in a game");
+        GameSession actualSession = null;
         for(GameSession gameSession : gameSessions)
         {
             if(gameSession.getSessionId().equals(gameSessionId))
             {
-                if(gameSession.isNotFull())
-                {
-                    gameSession.addPlayer(player);
-                }
-                else throw new Exception("Game is full");
+                actualSession = gameSession;
             }
-            else throw new Exception("Gamesession doesn't exist or is no longer active");
         }
+        if(actualSession != null)
+        {
+            if(actualSession.isNotFull())
+            {
+                actualSession.addPlayer(player);
+            }
+            else throw new Exception("Game is full");
+        }
+        else throw new Exception("Gamesession doesn't exist or is no longer active");
     }
 
     private boolean alreadyInGame(Session session)

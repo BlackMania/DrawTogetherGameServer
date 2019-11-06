@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class GameSession {
+    // ToDo
+    // Timer implementeren
     private String sessionId;
     private String hostId;
     private List<Player> players;
@@ -22,7 +24,7 @@ public class GameSession {
         started = false;
     }
 
-    //region f and setter
+    //region getters and setters
     public String getSessionId() {
         return sessionId;
     }
@@ -35,9 +37,22 @@ public class GameSession {
         return players;
     }
 
-    public void addPlayer(Player player) {
-        players.add(player);
+    public Chat getChat() {
+        return chat;
     }
+
+    public Player getPlayerBySession(Session session) {
+        for(Player p : players)
+        {
+            if(p.getSession() == session)
+            {
+                return p;
+            }
+        }
+        return null;
+    }
+
+
 
     public boolean isStarted() {
         return started;
@@ -47,7 +62,15 @@ public class GameSession {
         this.started = started;
     }
 
+    public Drawing getDrawing() {
+        return drawing;
+    }
+
     //endregion
+
+    public void addPlayer(Player player) {
+        players.add(player);
+    }
 
     public void removePlayer(Session session)
     {
@@ -77,5 +100,4 @@ public class GameSession {
         }
         return false;
     }
-
 }

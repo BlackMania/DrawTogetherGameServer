@@ -1,6 +1,7 @@
 package com.websocketgateway.endpoint;
 
 import com.gamelogic.GameSession;
+import com.gamelogic.Player;
 import com.gamelogic.SessionCollection;
 import com.websocketgateway.handler.APIHandler;
 import com.websocketgateway.handler.clientmessage.ClientMessageContextHandler;
@@ -82,7 +83,14 @@ public class ServerEndpoint {
         SessionCollection sessionCollection = SessionCollection.getInstance();
         try {
             GameSession gameSession = sessionCollection.getGameSessionByClientSession(session);
+            JSONObject object = new JSONObject();
+            object.put("task", "removePlayer");
+            object.put("removedPlayer", gameSession.getPlayerBySession(session).getNickname());
             gameSession.removePlayer(session);
+            for(Player player : gameSession.getPlayers())
+            {
+                player.getSession().getBasicRemote().sendText(object.toString());
+            }
         }
         catch(Exception exc)
         {

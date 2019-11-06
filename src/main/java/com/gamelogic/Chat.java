@@ -10,8 +10,8 @@ public class Chat {
         this.chatMessages = new ArrayList<ChatMessage>();
     }
 
-    public void addChatMessage()
+    public void addChatMessage(ChatMessage message)
     {
-
+        chatMessages.add(message);
     }
 }

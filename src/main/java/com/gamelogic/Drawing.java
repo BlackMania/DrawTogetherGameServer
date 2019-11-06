@@ -12,8 +12,17 @@ public class Drawing {
         this.coordinates = new ArrayList<DrawCoordinates>();
     }
 
+    public List<DrawCoordinates> getCoordinates() {
+        return coordinates;
+    }
+
+    public String getWord() {
+        return word;
+    }
+
     public void addCoordinate(DrawCoordinates coordinate)
     {
         coordinates.add(coordinate);
     }
+
 }
