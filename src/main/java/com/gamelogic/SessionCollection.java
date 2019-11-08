@@ -9,6 +9,10 @@ public class SessionCollection {
     private static SessionCollection sessionCollection = null;
     private List<GameSession> gameSessions;
 
+    public List<GameSession> getGameSessions() {
+        return gameSessions;
+    }
+
     public SessionCollection()
     {
         gameSessions = new ArrayList<GameSession>();
