@@ -4,4 +4,5 @@ public enum EMessage {
     Draw,
     CreateGame,
     JoinGame,
+    GetGames
 }

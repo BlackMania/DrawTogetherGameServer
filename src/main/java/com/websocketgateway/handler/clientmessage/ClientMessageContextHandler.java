@@ -14,6 +14,7 @@ public class ClientMessageContextHandler {
         messageHandlers.put(EMessage.Draw, new DrawClientMessage());
         messageHandlers.put(EMessage.CreateGame, new CreateGameSessionMessage());
         messageHandlers.put(EMessage.JoinGame, new JoinGameSessionMessage());
+        messageHandlers.put(EMessage.GetGames, new GetGamesClientMessage());
     }
 
     public static void processMessage(EMessage taskname, JSONObject jsonObject, Session session)
