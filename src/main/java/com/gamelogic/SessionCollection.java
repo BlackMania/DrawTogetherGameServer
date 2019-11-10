@@ -35,14 +35,14 @@ public class SessionCollection {
         throw new Exception("Gamesession doesn't exist or is no longer active");
     }
 
-    public GameSession getGameSessionByClientSession(Session session) throws Exception
+    public GameSession getGameSessionByClientSession(Session session)
     {
         for(GameSession gameSession : gameSessions)
         {
             if(gameSession.checkIfPlayerIsInHere(session))
                 return gameSession;
         }
-        throw new Exception("Player is not in a game session");
+        return null;
     }
 
     public GameSession getLastGameSession() {
@@ -53,8 +53,8 @@ public class SessionCollection {
         gameSessions.add(new GameSession(hostId));
     }
 
-    public void joinGameSession(Player player, String gameSessionId) throws Exception{
-        if(alreadyInGame(player.getSession())) throw new Exception("You are already in a game");
+    public boolean joinGameSession(Player player, String gameSessionId){
+        if(alreadyInGame(player.getSession())) return false;
         GameSession actualSession = null;
         for(GameSession gameSession : gameSessions)
         {
@@ -69,9 +69,27 @@ public class SessionCollection {
             {
                 actualSession.addPlayer(player);
             }
-            else throw new Exception("Game is full");
+            else return false;
         }
-        else throw new Exception("Gamesession doesn't exist or is no longer active");
+        else return false;
+        return true;
+    }
+
+    public boolean leaveGameSession(Player player, String gameSessionId) {
+        if(!alreadyInGame(player.getSession())) return false;
+        GameSession actualSession = null;
+        for(GameSession gameSession : gameSessions)
+        {
+            if(gameSession.getSessionId().equals(gameSessionId))
+            {
+                actualSession = gameSession;
+            }
+        }
+        if(actualSession != null)
+        {
+            actualSession.removePlayer(player.getSession());
+        } else return false;
+        return true;
     }
 
     private boolean alreadyInGame(Session session)

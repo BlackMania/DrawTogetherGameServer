@@ -12,33 +12,20 @@ import java.sql.Timestamp;
 
 public class JoinGameSessionMessage implements ClientMessageHandler {
     @Override
-    public void processMessage(JSONObject jsonObject, Session session) {
+    public boolean processMessage(JSONObject jsonObject, Session session){
         SessionCollection sessionCollection = SessionCollection.getInstance();
         Player player = new Player(session, jsonObject.getString("nickname"));
-        try {
-            sessionCollection.joinGameSession(player, jsonObject.get("gameSessionId").toString());
-            try{
-                session.getBasicRemote().sendText("You joined the game");
-            }
-            catch(IOException exc)
-            {
-                exc.printStackTrace();
-            }
-        }
-        catch(Exception exc)
+        if(!sessionCollection.joinGameSession(player, jsonObject.get("gameSessionId").toString()))
         {
-            try{
-                session.getBasicRemote().sendText(exc.getMessage());
-            }
-            catch(IOException e)
-            {
-                e.printStackTrace();
-            }
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            System.out.printf("[Failed joining game] %s | %s \n", session.getId(), timestamp.toString());
+            return false;
         }
+        else return true;
     }
 
     @Override
-    public void updateMessage(Session session) {
+    public boolean updateMessage(Session session) {
         SessionCollection sessionCollection = SessionCollection.getInstance();
 
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -81,6 +68,8 @@ public class JoinGameSessionMessage implements ClientMessageHandler {
         catch(Exception exc)
         {
             exc.printStackTrace();
+            return false;
         }
+        return true;
     }
 }

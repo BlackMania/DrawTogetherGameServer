@@ -81,20 +81,28 @@ public class ServerEndpoint {
     {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         SessionCollection sessionCollection = SessionCollection.getInstance();
+        GameSession gameSession = sessionCollection.getGameSessionByClientSession(session);
+        JSONObject object = new JSONObject();
+
         try {
-            GameSession gameSession = sessionCollection.getGameSessionByClientSession(session);
-            JSONObject object = new JSONObject();
-            object.put("task", "removePlayer");
-            object.put("removedPlayer", gameSession.getPlayerBySession(session).getNickname());
-            gameSession.removePlayer(session);
-            for(Player player : gameSession.getPlayers())
+            if(gameSession != null)
             {
-                player.getSession().getBasicRemote().sendText(object.toString());
+                object.put("task", "removePlayer");
+                object.put("removedPlayer", gameSession.getPlayerBySession(session).getNickname());
+                gameSession.removePlayer(session);
+                if(gameSession.getPlayers().size() != 0)
+                {
+                    for(Player player : gameSession.getPlayers())
+                    {
+                        player.getSession().getBasicRemote().sendText(object.toString());
+                    }
+                }
             }
+
         }
         catch(Exception exc)
         {
-            System.out.printf("[Removing Client from GameSession exited with error] %s | %s | %s \n", session.getId(), exc.getMessage(), timestamp.toString());
+            System.out.printf("[Error updating clients on close] %s | %s | %s \n", session.getId(), exc.getMessage(), timestamp.toString());
         }
         System.out.printf("[Connection closed] %s | %s | %s \n", session.getId(), reason.getCloseCode() + " - " + reason.getReasonPhrase(), timestamp.toString());
         sessions.remove(session);

@@ -6,7 +6,7 @@ import javax.websocket.Session;
 
 interface ClientMessageHandler
 {
-    void processMessage(JSONObject jsonObject, Session session);
+    boolean processMessage(JSONObject jsonObject, Session session);
 
-    void updateMessage(Session session);
+    boolean updateMessage(Session session);
 }

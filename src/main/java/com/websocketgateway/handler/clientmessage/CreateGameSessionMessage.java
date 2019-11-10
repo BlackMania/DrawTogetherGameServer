@@ -11,15 +11,16 @@ import java.sql.Timestamp;
 public class CreateGameSessionMessage implements ClientMessageHandler {
 
     @Override
-    public void processMessage(JSONObject jsonObject, Session session) {
+    public boolean processMessage(JSONObject jsonObject, Session session){
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         SessionCollection sessionCollection = SessionCollection.getInstance();
         sessionCollection.createGameSession(session.getId());
         System.out.printf("[New Game Session] %s | New Game Session created with ID: %s | %s \n", session.getId(), sessionCollection.getLastGameSession().getSessionId(), timestamp.toString());
+        return true;
     }
 
     @Override
-    public void updateMessage(Session session) {
+    public boolean updateMessage(Session session) {
         SessionCollection sessionCollection = SessionCollection.getInstance();
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
@@ -31,6 +32,8 @@ public class CreateGameSessionMessage implements ClientMessageHandler {
             System.out.printf("[Client Updated] %s | %s \n", jsonObject.toString(), timestamp.toString());
         } catch (Exception exc) {
             System.out.printf("[Create Game Error Updating Client] Updated client | %s | %s \n", exc.getMessage(), timestamp.toString());
+            return false;
         }
+        return true;
     }
 }
