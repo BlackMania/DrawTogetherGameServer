@@ -5,32 +5,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class GameSession {
-    // ToDo
-    // Timer implementeren
+public class Lobby {
     private String sessionId;
-    private String hostId;
     private List<Player> players;
     private final int MAX_PLAYERS = 6;
     private Chat chat;
     private Drawing drawing;
     private boolean started;
 
-    public GameSession(String hostId) {
+    public Lobby() {
         sessionId = UUID.randomUUID().toString();
-        this.hostId = hostId;
         players = new ArrayList<Player>();
         chat = new Chat();
         started = false;
     }
 
     //region getters and setters
-    public String getSessionId() {
+    public String getLobbyId() {
         return sessionId;
-    }
-
-    public String getHostId() {
-        return hostId;
     }
 
     public List<Player> getPlayers() {
@@ -44,7 +36,7 @@ public class GameSession {
     public Player getPlayerBySession(Session session) {
         for(Player p : players)
         {
-            if(p.getSession() == session)
+            if(p.getClientSession() == session)
             {
                 return p;
             }
@@ -77,7 +69,7 @@ public class GameSession {
         Player playerToRemove = null;
         for(Player player : players)
         {
-            if(player.getSession() == session)
+            if(player.getClientSession() == session)
             {
                 playerToRemove = player;
             }
@@ -91,12 +83,15 @@ public class GameSession {
     public boolean isNotFull(){
         return players.size() != MAX_PLAYERS;
     }
+
     public boolean checkIfPlayerIsInHere(Session session)
     {
         for(Player player : players)
         {
-            if(player.getSession().getId().equals(session.getId()))
+            if(player.getClientSession().equals(session))
+            {
                 return true;
+            }
         }
         return false;
     }
