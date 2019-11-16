@@ -1,38 +1,37 @@
 package com.websocketgateway.handler.clientmessage;
 
-import com.gamelogic.GameSession;
-import com.gamelogic.SessionCollection;
+import com.gamelogic.Lobby;
+import com.gamelogic.LobbyCollection;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.websocket.Session;
 import java.io.IOException;
-import java.sql.Timestamp;
 
 public class GetGamesClientMessage implements ClientMessageHandler {
     @Override
-    public boolean processMessage(JSONObject jsonObject, Session session) {
-        System.out.printf("[Executing] GetGames | No task to run \n");
-        return true;
+    public JSONObject processMessage(JSONObject jsonObject, Session clientSession) {
+        return null;
     }
 
     @Override
-    public boolean updateMessage(Session session) {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        SessionCollection sessionCollection = SessionCollection.getInstance();
-        JSONObject jsonObject = new JSONObject();
-        JSONArray jsonArray = new JSONArray();
-        jsonObject.put("task", "updateGameList");
-        for(GameSession gameSession : sessionCollection.getGameSessions())
+    public boolean updateMessage(Session clientSession, JSONObject responseData) {
+        LobbyCollection lobbies = LobbyCollection.getInstance();
+        JSONObject clientResponse = new JSONObject();
+        JSONArray array = new JSONArray();
+        for(Lobby lobby : lobbies.getLobbies())
         {
-            jsonArray.put(gameSession.getSessionId());
+            array.put(lobby.getLobbyId());
         }
-        jsonObject.put("gameLobbys", jsonArray);
-        try {
-            session.getBasicRemote().sendText(jsonObject.toString());
-            System.out.printf("[Client Updated] Message: %s | %s \n", jsonObject.toString(), timestamp.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
+        clientResponse.put("task", "updateGameList");
+        clientResponse.put("gameLobbys", array);
+        try
+        {
+            clientSession.getBasicRemote().sendText(clientResponse.toString());
+        }
+        catch (IOException exc)
+        {
+            exc.printStackTrace();
             return false;
         }
         return true;

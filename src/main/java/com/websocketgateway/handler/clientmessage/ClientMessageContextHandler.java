@@ -11,15 +11,15 @@ public class ClientMessageContextHandler {
     private static Map<EMessage, ClientMessageHandler> messageHandlers = new HashMap<EMessage, ClientMessageHandler>();
 
     static {
-        messageHandlers.put(EMessage.Draw, new DrawClientMessage());
-        messageHandlers.put(EMessage.CreateGame, new CreateGameSessionMessage());
-        messageHandlers.put(EMessage.JoinGame, new JoinGameSessionMessage());
+        messageHandlers.put(EMessage.CreateGame, new CreateLobbyClientMessage());
+        messageHandlers.put(EMessage.JoinGame, new JoinLobbyClientMessage());
         messageHandlers.put(EMessage.GetGames, new GetGamesClientMessage());
+        messageHandlers.put(EMessage.LeaveGame, new LeaveLobbyClientMessage());
     }
 
-    public static void processMessage(EMessage taskname, JSONObject jsonObject, Session session)
+    public static boolean processMessage(EMessage taskname, JSONObject jsonObject, Session clientSession)
     {
-        messageHandlers.get(taskname).processMessage(jsonObject, session);
-        messageHandlers.get(taskname).updateMessage(session);
+        JSONObject response = messageHandlers.get(taskname).processMessage(jsonObject, clientSession);
+        return messageHandlers.get(taskname).updateMessage(clientSession, response);
     }
 }
