@@ -28,7 +28,7 @@ public class Player {
         this.nickname = nickname;
     }
 
-    public Session getSession() {
+    public Session getClientSession() {
         return session;
     }
 
