@@ -15,6 +15,7 @@ public class ClientMessageContextHandler {
         messageHandlers.put(EMessage.JoinGame, new JoinLobbyClientMessage());
         messageHandlers.put(EMessage.GetGames, new GetGamesClientMessage());
         messageHandlers.put(EMessage.LeaveGame, new LeaveLobbyClientMessage());
+        messageHandlers.put(EMessage.StartGame, new StartGameClientMessage());
     }
 
     public static boolean processMessage(EMessage taskname, JSONObject jsonObject, Session clientSession)
