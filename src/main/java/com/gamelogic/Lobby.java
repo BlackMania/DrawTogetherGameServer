@@ -3,6 +3,7 @@ package com.gamelogic;
 import javax.websocket.Session;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 public class Lobby {
@@ -12,6 +13,7 @@ public class Lobby {
     private Chat chat;
     private Drawing drawing;
     private boolean started;
+    private Player roomMaster;
 
     public Lobby() {
         sessionId = UUID.randomUUID().toString();
@@ -44,7 +46,9 @@ public class Lobby {
         return null;
     }
 
-
+    public Player getRoomMaster() {
+        return roomMaster;
+    }
 
     public boolean isStarted() {
         return started;
@@ -61,6 +65,10 @@ public class Lobby {
     //endregion
 
     public void addPlayer(Player player) {
+        if(players.size() < 1)
+        {
+            roomMaster = player;
+        }
         players.add(player);
     }
 
@@ -77,6 +85,10 @@ public class Lobby {
         if(playerToRemove != null)
         {
             players.remove(playerToRemove);
+            if(players.size() != 0)
+            {
+                roomMaster = players.get(0);
+            }
         }
     }
 
@@ -94,5 +106,14 @@ public class Lobby {
             }
         }
         return false;
+    }
+
+    public Player getAndSetRandomPlayerToDraw()
+    {
+        Random randomGenerator = new Random();
+        int randomInt = randomGenerator.nextInt(this.players.size());
+        Player drawer = players.get(randomInt);
+        drawer.setDrawer(true);
+        return drawer;
     }
 }
