@@ -86,19 +86,16 @@ public class LobbyCollection {
         return true;
     }
 
-    public boolean leaveLobby(Player player, String gameSessionId) {
-        if(!alreadyInLobby(player.getClientSession())) return false;
-        Lobby actualSession = null;
-        for(Lobby lobby : lobbies)
-        {
-            if(lobby.getLobbyId().equals(gameSessionId))
-            {
-                actualSession = lobby;
-            }
-        }
+    public boolean leaveLobby(Session clientSession) {
+        if(!alreadyInLobby(clientSession)) return false;
+        Lobby actualSession = getLobbyByClientSession(clientSession);
         if(actualSession != null)
         {
-            actualSession.removePlayer(player.getClientSession());
+            actualSession.removePlayer(clientSession);
+            if(actualSession.getPlayers().size() == 0)
+            {
+                lobbies.remove(actualSession);
+            }
         } else return false;
         return true;
     }
