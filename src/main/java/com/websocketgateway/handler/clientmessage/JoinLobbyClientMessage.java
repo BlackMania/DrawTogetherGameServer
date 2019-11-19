@@ -16,15 +16,22 @@ public class JoinLobbyClientMessage implements ClientMessageHandler {
         JSONObject json = new JSONObject();
         if(jsonObject.get("nickname") != null || jsonObject.get("gameSessionId") != null)
         {
-            lobbies.joinLobby(new Player(clientSession, jsonObject.getString("nickname")), jsonObject.getString("gameSessionId"));
-            json.put("status", "successful");
+            boolean success = lobbies.joinLobby(new Player(clientSession, jsonObject.getString("nickname")), jsonObject.getString("gameSessionId"));
+            if(success)
+            {
+                json.put("status", "successful");
+            }
+            else
+            {
+                json.put("status", "error");
+                json.put("reason", "Something went wrong joining the game");
+            }
         }
         else
         {
             json.put("status", "error");
             json.put("reason", "Something went wrong joining the game");
         }
-
         return json;
     }
 
@@ -47,6 +54,7 @@ public class JoinLobbyClientMessage implements ClientMessageHandler {
                     }
                     thisClientResponse.put("task", "addPlayers");
                     thisClientResponse.put("players", array);
+                    thisClientResponse.put("roomMaster", lobby.getRoomMaster().getNickname());
                 }
                 else
                 {
@@ -58,6 +66,14 @@ public class JoinLobbyClientMessage implements ClientMessageHandler {
         else
         {
             thisClientResponse.put("error", responseData.getString("reason"));
+            try{
+                clientSession.getBasicRemote().sendText(thisClientResponse.toString());
+            } catch(IOException exc)
+            {
+                exc.printStackTrace();
+                return false;
+            }
+            return true;
         }
         Lobby lobby = lobbies.getLobbyByClientSession(clientSession);
         for(Player player : lobby.getPlayers())
