@@ -14,15 +14,29 @@ public class Lobby {
     private Drawing drawing;
     private boolean started;
     private Player roomMaster;
+    private int rounds;
+    private boolean roundIsRunning;
 
     public Lobby() {
         sessionId = UUID.randomUUID().toString();
         players = new ArrayList<Player>();
         chat = new Chat();
         started = false;
+        rounds = 3;
+        roundIsRunning = false;
     }
 
     //region getters and setters
+
+
+    public boolean isRoundIsRunning() {
+        return roundIsRunning;
+    }
+
+    public void setRoundIsRunning(boolean roundIsRunning) {
+        this.roundIsRunning = roundIsRunning;
+    }
+
     public String getLobbyId() {
         return sessionId;
     }
@@ -60,6 +74,10 @@ public class Lobby {
 
     public Drawing getDrawing() {
         return drawing;
+    }
+
+    public void setDrawing(Drawing drawing) {
+        this.drawing = drawing;
     }
 
     //endregion
@@ -115,5 +133,32 @@ public class Lobby {
         Player drawer = players.get(randomInt);
         drawer.setDrawer(true);
         return drawer;
+    }
+
+    public boolean checkIfClientIsDrawer(Session clientSession)
+    {
+        for(Player player : players)
+        {
+            if(player.getClientSession() == clientSession)
+            {
+                return true;
+            } else return false;
+        }
+        return false;
+    }
+
+    private void endGame() {
+        // Update all collected data to database
+    }
+
+    public void endRound() {
+        // Set new drawer, Add new Drawing
+        if(rounds != 0)
+        {
+            this.rounds--;
+        }
+        else {
+            endGame();
+        }
     }
 }

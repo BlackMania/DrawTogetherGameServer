@@ -7,8 +7,8 @@ public class Drawing {
     private String word;
     private List<DrawCoordinates> coordinates;
 
-    public Drawing() {
-        word = "";
+    public Drawing(String word) {
+        this.word = word;
         this.coordinates = new ArrayList<DrawCoordinates>();
     }
 

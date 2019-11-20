@@ -5,5 +5,8 @@ public enum EMessage {
     JoinGame,
     GetGames,
     LeaveGame,
-    StartGame
+    StartGame,
+    GetDrawWords,
+    SetWord,
+    EndRound
 }
