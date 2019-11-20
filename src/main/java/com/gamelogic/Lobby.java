@@ -142,7 +142,7 @@ public class Lobby {
             if(player.getClientSession() == clientSession)
             {
                 return true;
-            } else return false;
+            }
         }
         return false;
     }
