@@ -161,4 +161,20 @@ public class Lobby {
             endGame();
         }
     }
+
+    public boolean checkWordGuess(String content)
+    {
+        if(drawing != null)
+        {
+            String word = drawing.getWord();
+            if(word != null)
+            {
+                if(word.toLowerCase().equals(content.toLowerCase()))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
