@@ -19,6 +19,7 @@ public class ClientMessageContextHandler {
         messageHandlers.put(EMessage.GetDrawWords, new GetDrawWordClientMessage());
         messageHandlers.put(EMessage.SetWord, new SetWordClientMessage());
         messageHandlers.put(EMessage.SendCoordinates, new SendCoordinatesClientMessage());
+        messageHandlers.put(EMessage.GuessDrawing, new GuessDrawingClientMessage());
     }
 
     public static boolean processMessage(EMessage taskname, JSONObject jsonObject, Session clientSession)
