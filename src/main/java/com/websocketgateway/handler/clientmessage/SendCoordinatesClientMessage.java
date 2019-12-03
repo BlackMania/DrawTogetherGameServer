@@ -29,8 +29,7 @@ public class SendCoordinatesClientMessage implements ClientMessageHandler {
     public boolean updateMessage(Session clientSession, JSONObject responseData) {
         LobbyCollection lobbies = LobbyCollection.getInstance();
         Lobby lobby  = lobbies.getLobbyByClientSession(clientSession);
-        JSONObject clientResponse = new JSONObject();
-        clientResponse = responseData;
+        JSONObject clientResponse = responseData;
         clientResponse.put("task", "addCoordinate");
         for(Player player : lobby.getPlayers())
         {

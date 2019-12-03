@@ -1,5 +1,7 @@
 package com.gamelogic;
 
+import org.json.JSONObject;
+
 import javax.websocket.Session;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,16 +29,6 @@ public class Lobby {
     }
 
     //region getters and setters
-
-
-    public boolean isRoundIsRunning() {
-        return roundIsRunning;
-    }
-
-    public void setRoundIsRunning(boolean roundIsRunning) {
-        this.roundIsRunning = roundIsRunning;
-    }
-
     public String getLobbyId() {
         return sessionId;
     }
@@ -58,6 +50,21 @@ public class Lobby {
             }
         }
         return null;
+    }
+
+    public int getRounds() {
+        return rounds;
+    }
+
+    public void startRound(Drawing drawing) {
+        this.drawing = drawing;
+        this.roundIsRunning = true;
+    }
+
+    public void roundEnd() {
+        this.roundIsRunning = false;
+        this.drawing = null;
+        this.rounds--;
     }
 
     public Player getRoomMaster() {
@@ -147,19 +154,13 @@ public class Lobby {
         return false;
     }
 
-    private void endGame() {
+    public void endGame() {
+        this.started = false;
+        this.drawing = null;
+        this.rounds = 3;
+        this.chat = new Chat();
+        this.roundIsRunning = false;
         // Update all collected data to database
-    }
-
-    public void endRound() {
-        // Set new drawer, Add new Drawing
-        if(rounds != 0)
-        {
-            this.rounds--;
-        }
-        else {
-            endGame();
-        }
     }
 
     public boolean checkWordGuess(String content)
