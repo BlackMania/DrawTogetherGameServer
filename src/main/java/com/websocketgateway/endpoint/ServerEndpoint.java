@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
+import java.io.Console;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.sql.Timestamp;
@@ -23,22 +24,25 @@ public class ServerEndpoint {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         System.out.printf("[Connection opened] Session id: %s | Token used: %s | %s \n", clientSession.getId(), token, timestamp.toString());
         try {
-            APIHandler handler = new APIHandler("http://localhost:9091/api/secured/tokenauth");
+            APIHandler handler = new APIHandler("http://localhost:9091/api/auth/tokenauth");
             int response = handler.verifyUserToken(token).getResponseCode();
+            System.out.print(response);
             if(response != HttpURLConnection.HTTP_OK)
             {
                 clientSession.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT,  String.format("Couldn't accept token. Responsecode: %s", response)));
                 return;
             }
+            else {
+                try{
+                    clientSession.getBasicRemote().sendText("You successfully connected");
+                }
+                catch(IOException exc)
+                {
+                    exc.printStackTrace();
+                }
+            }
         }
         catch(Exception exc)
-        {
-            exc.printStackTrace();
-        }
-        try{
-            clientSession.getBasicRemote().sendText("You successfully connected");
-        }
-        catch(IOException exc)
         {
             exc.printStackTrace();
         }
