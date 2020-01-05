@@ -1,8 +1,5 @@
 package com.websocketgateway.endpoint;
 
-import com.gamelogic.Lobby;
-import com.gamelogic.Player;
-import com.gamelogic.LobbyCollection;
 import com.websocketgateway.handler.APIHandler;
 import com.websocketgateway.handler.clientmessage.ClientMessageContextHandler;
 import com.websocketgateway.handler.clientmessage.EMessage;
