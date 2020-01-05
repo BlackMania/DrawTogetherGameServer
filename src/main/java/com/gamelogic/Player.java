@@ -7,12 +7,14 @@ public class Player {
     private int points;
     private boolean drawer;
     private String nickname;
+    private boolean guessedWord;
 
     public Player(Session session, String nickname) {
         this.session = session;
         this.nickname = nickname;
         points = 0;
         drawer = false;
+        guessedWord = false;
     }
 
     //region Getters and setters
@@ -43,6 +45,23 @@ public class Player {
     public String getNickname() {
         return nickname;
     }
+
+    public Session getSession() {
+        return session;
+    }
+
+    public void setSession(Session session) {
+        this.session = session;
+    }
+
+    public boolean isGuessedWord() {
+        return guessedWord;
+    }
+
+    public void setGuessedWord(boolean guessedWord) {
+        this.guessedWord = guessedWord;
+    }
+
     //endregion
 
 

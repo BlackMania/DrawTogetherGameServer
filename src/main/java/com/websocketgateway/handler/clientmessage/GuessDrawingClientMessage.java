@@ -31,13 +31,16 @@ public class GuessDrawingClientMessage implements ClientMessageHandler {
             lobby.getChat().addChatMessage(new ChatMessage(timestamp, content, player));
             if(lobby.checkWordGuess(content))
             {
+                player.setGuessedWord(true);
                 json.put("correct", true);
+                json.put("message", "guessed the word correctly!");
+                json.put("messager", lobby.getPlayerBySession(clientSession).getNickname());
             }
             else {
                 json.put("correct", false);
+                json.put("message", jsonObject.getString("message"));
+                json.put("messager", lobby.getPlayerBySession(clientSession).getNickname());
             }
-            json.put("message", jsonObject.getString("message"));
-            json.put("messager", lobby.getPlayerBySession(clientSession).getNickname());
             json.put("status", "successful");
         }
         else {

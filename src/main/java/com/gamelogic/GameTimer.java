@@ -2,6 +2,7 @@ package com.gamelogic;
 
 import com.websocketgateway.handler.clientmessage.ClientMessageContextHandler;
 import com.websocketgateway.handler.clientmessage.EMessage;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.websocket.Session;
@@ -42,14 +43,37 @@ public class GameTimer extends TimerTask {
             }
         }
         else {
-            lobby.setRoundIsRunning(false);
-            object.put("task", "roundEnded");
-            for(Session clientSession : clientSessions)
-            {
-                try {
-                    clientSession.getBasicRemote().sendText(object.toString());
-                } catch (IOException e) {
-                    e.printStackTrace();
+            if(lobby.getRounds() > 0) {
+                lobby.roundEnd();
+                Player newDrawer = lobby.getAndSetRandomPlayerToDraw();
+                for (Session clientSession : clientSessions) {
+                    object = new JSONObject();
+                    object.put("drawer", newDrawer.getNickname());
+                    if (clientSession == newDrawer.getClientSession()) {
+                        object.put("task", "chooseWord2");
+                    } else {
+                        object.put("task", "roundEnded");
+                    }
+
+                    try {
+                        clientSession.getBasicRemote().sendText(object.toString());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            else {
+                lobby.endGame();
+                object = new JSONObject();
+                object.put("task", "backToLobbyState");
+                for(Session clientSession : clientSessions)
+                {
+                    try{
+                        clientSession.getBasicRemote().sendText(object.toString());
+                    } catch(IOException e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
             this.cancel();

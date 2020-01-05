@@ -8,7 +8,6 @@ public enum EMessage {
     StartGame,
     GetDrawWords,
     SetWord,
-    EndRound,
     SendCoordinates,
     GuessDrawing
 }

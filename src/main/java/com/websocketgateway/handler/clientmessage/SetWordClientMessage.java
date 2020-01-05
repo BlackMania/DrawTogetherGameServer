@@ -17,8 +17,7 @@ public class SetWordClientMessage implements ClientMessageHandler {
         {
             if(lobby.checkIfClientIsDrawer(clientSession))
             {
-                lobby.setRoundIsRunning(true);
-                lobby.setDrawing(new Drawing(jsonObject.getString("word")));
+                lobby.startRound(new Drawing(jsonObject.getString("word")));
                 json.put("wordCount",jsonObject.getString("word").length());
                 json.put("status", "successful");
             }
