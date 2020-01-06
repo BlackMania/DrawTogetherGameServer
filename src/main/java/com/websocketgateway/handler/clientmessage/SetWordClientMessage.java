@@ -1,6 +1,9 @@
 package com.websocketgateway.handler.clientmessage;
 
 import com.gamelogic.*;
+import com.websocketgateway.jsonbuilder.BuildType;
+import com.websocketgateway.jsonbuilder.JSONBuilderHandler;
+import com.websocketgateway.session.SessionCollection;
 import org.json.JSONObject;
 
 import javax.websocket.Session;
@@ -9,46 +12,40 @@ import java.util.Timer;
 
 public class SetWordClientMessage implements ClientMessageHandler {
     @Override
-    public JSONObject processMessage(JSONObject jsonObject, Session clientSession) {
-        JSONObject json = new JSONObject();
+    public JSONObject processMessage(JSONObject jsonObject, String clientid) {
         LobbyCollection lobbies = LobbyCollection.getInstance();
-        Lobby lobby = lobbies.getLobbyByClientSession(clientSession);
+        Lobby lobby = lobbies.getLobbyByClientId(clientid);
         if(lobby != null)
         {
-            if(lobby.checkIfClientIsDrawer(clientSession))
+            if(lobby.checkIfClientIsDrawer(clientid))
             {
                 lobby.startRound(new Drawing(jsonObject.getString("word")));
-                json.put("wordCount",jsonObject.getString("word").length());
-                json.put("status", "successful");
+                return JSONBuilderHandler.buildJson(new String[]{jsonObject.getString("word")}, BuildType.SETWORD);
             }
             else {
-                json.put("status", "error");
-                json.put("reason", "Player is not the drawer");
+                return JSONBuilderHandler.buildJson(new String[]{"Player is not the drawer"}, BuildType.ERRORJSON);
             }
         }
         else {
-            json.put("status", "error");
-            json.put("reason", "Player is not in a lobby");
+            return JSONBuilderHandler.buildJson(new String[]{"Player is not in a lobby"}, BuildType.ERRORJSON);
         }
-        return json;
     }
 
     @Override
-    public boolean updateMessage(Session clientSession, JSONObject responseData) {
-        JSONObject clientResponse = new JSONObject();
+    public boolean updateMessage(String clientid, JSONObject responseData) {
         LobbyCollection lobbies = LobbyCollection.getInstance();
-        Lobby lobby = lobbies.getLobbyByClientSession(clientSession);
-        if(!responseData.getString("status").equals("error"))
+        Lobby lobby = lobbies.getLobbyByClientId(clientid);
+        if(!responseData.has("error"))
         {
-            clientResponse.put("task", "wordSet");
-            clientResponse.put("wordCount", responseData.getInt("wordCount"));
             Timer timer = new Timer();
             timer.schedule(new GameTimer(lobby), 0, 1000);
 
-            for(Player p : lobby.getPlayers())
+            for(Player player : lobby.getPlayers())
             {
+                SessionCollection collection = SessionCollection.getInstance();
+                Session session = collection.getSessionByClientId(player.getClientid());
                 try {
-                    p.getClientSession().getBasicRemote().sendText(clientResponse.toString());
+                    session.getBasicRemote().sendText(responseData.toString());
                 } catch (IOException e) {
                     e.printStackTrace();
                     return false;
@@ -56,9 +53,10 @@ public class SetWordClientMessage implements ClientMessageHandler {
             }
         }
         else {
-            clientResponse.put("error", responseData.getString("reason"));
+            SessionCollection collection = SessionCollection.getInstance();
+            Session session = collection.getSessionByClientId(clientid);
             try {
-                clientSession.getBasicRemote().sendText(clientResponse.toString());
+                session.getBasicRemote().sendText(responseData.toString());
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;
