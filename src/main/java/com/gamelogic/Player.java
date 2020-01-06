@@ -3,14 +3,14 @@ package com.gamelogic;
 import javax.websocket.Session;
 
 public class Player {
-    private Session session;
     private int points;
     private boolean drawer;
     private String nickname;
     private boolean guessedWord;
+    private String clientid;
 
-    public Player(Session session, String nickname) {
-        this.session = session;
+    public Player(String clientid, String nickname) {
+        this.clientid = clientid;
         this.nickname = nickname;
         points = 0;
         drawer = false;
@@ -30,10 +30,6 @@ public class Player {
         this.nickname = nickname;
     }
 
-    public Session getClientSession() {
-        return session;
-    }
-
     public int getPoints() {
         return points;
     }
@@ -46,14 +42,6 @@ public class Player {
         return nickname;
     }
 
-    public Session getSession() {
-        return session;
-    }
-
-    public void setSession(Session session) {
-        this.session = session;
-    }
-
     public boolean isGuessedWord() {
         return guessedWord;
     }
@@ -62,6 +50,13 @@ public class Player {
         this.guessedWord = guessedWord;
     }
 
+    public String getClientid() {
+        return clientid;
+    }
+
+    public void setClientid(String clientid) {
+        this.clientid = clientid;
+    }
     //endregion
 
 

@@ -2,6 +2,7 @@ package com.gamelogic;
 
 import com.websocketgateway.handler.clientmessage.ClientMessageContextHandler;
 import com.websocketgateway.handler.clientmessage.EMessage;
+import com.websocketgateway.session.SessionCollection;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -16,13 +17,15 @@ public class GameTimer extends TimerTask {
     int counter = 60;
     private Lobby lobby;
     private List<Session> clientSessions;
+    private SessionCollection collection;
 
     public GameTimer(Lobby lobby) {
         this.lobby = lobby;
         clientSessions = new ArrayList<Session>();
+        collection = SessionCollection.getInstance();
         for(Player player : lobby.getPlayers())
         {
-            clientSessions.add(player.getClientSession());
+            clientSessions.add(collection.getSessionByClientId(player.getClientid()));
         }
     }
 
@@ -49,7 +52,7 @@ public class GameTimer extends TimerTask {
                 for (Session clientSession : clientSessions) {
                     object = new JSONObject();
                     object.put("drawer", newDrawer.getNickname());
-                    if (clientSession == newDrawer.getClientSession()) {
+                    if (clientSession == collection.getSessionByClientId(newDrawer.getClientid())) {
                         object.put("task", "chooseWord2");
                     } else {
                         object.put("task", "roundEnded");

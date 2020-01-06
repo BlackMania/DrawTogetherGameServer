@@ -41,10 +41,10 @@ public class Lobby {
         return chat;
     }
 
-    public Player getPlayerBySession(Session session) {
+    public Player getPlayerByClientId(String clientid) {
         for(Player p : players)
         {
-            if(p.getClientSession() == session)
+            if(p.getClientid().equals(clientid))
             {
                 return p;
             }
@@ -97,12 +97,12 @@ public class Lobby {
         players.add(player);
     }
 
-    public void removePlayer(Session session)
+    public void removePlayer(String clientid)
     {
         Player playerToRemove = null;
         for(Player player : players)
         {
-            if(player.getClientSession() == session)
+            if(player.getClientid().equals(clientid))
             {
                 playerToRemove = player;
             }
@@ -121,11 +121,11 @@ public class Lobby {
         return players.size() != MAX_PLAYERS;
     }
 
-    public boolean checkIfPlayerIsInHere(Session session)
+    public boolean checkIfPlayerIsInHere(String clientid)
     {
         for(Player player : players)
         {
-            if(player.getClientSession().equals(session))
+            if(player.getClientid().equals(clientid))
             {
                 return true;
             }
@@ -142,11 +142,11 @@ public class Lobby {
         return drawer;
     }
 
-    public boolean checkIfClientIsDrawer(Session clientSession)
+    public boolean checkIfClientIsDrawer(String clientid)
     {
         for(Player player : players)
         {
-            if(player.getClientSession() == clientSession)
+            if(player.getClientid().equals(clientid))
             {
                 return true;
             }

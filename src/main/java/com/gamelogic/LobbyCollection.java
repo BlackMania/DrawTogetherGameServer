@@ -1,6 +1,5 @@
 package com.gamelogic;
 
-import javax.websocket.Session;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,11 +24,11 @@ public class LobbyCollection {
         return lobbies;
     }
 
-    public Lobby getLobbyByClientSession(Session session)
+    public Lobby getLobbyByClientId(String clientid)
     {
         for(Lobby lobby : lobbies)
         {
-            if(lobby.checkIfPlayerIsInHere(session))
+            if(lobby.checkIfPlayerIsInHere(clientid))
                 return lobby;
         }
         return null;
@@ -51,8 +50,8 @@ public class LobbyCollection {
         return lobbies.get(lobbies.size() - 1).getLobbyId();
     }
 
-    public boolean createLobby(Session clientSession) {
-        if(alreadyInLobby(clientSession))
+    public boolean createLobby(String clientid) {
+        if(alreadyInLobby(clientid))
         {
             return false;
         }
@@ -64,7 +63,7 @@ public class LobbyCollection {
 
 
     public boolean joinLobby(Player player, String gameSessionId){
-        if(alreadyInLobby(player.getClientSession())) return false;
+        if(alreadyInLobby(player.getClientid())) return false;
         Lobby lobbyToJoin = null;
         for(Lobby lobby : lobbies)
         {
@@ -86,12 +85,12 @@ public class LobbyCollection {
         return true;
     }
 
-    public boolean leaveLobby(Session clientSession) {
-        if(!alreadyInLobby(clientSession)) return false;
-        Lobby actualSession = getLobbyByClientSession(clientSession);
+    public boolean leaveLobby(String clientid) {
+        if(!alreadyInLobby(clientid)) return false;
+        Lobby actualSession = getLobbyByClientId(clientid);
         if(actualSession != null)
         {
-            actualSession.removePlayer(clientSession);
+            actualSession.removePlayer(clientid);
             if(actualSession.getPlayers().size() == 0)
             {
                 lobbies.remove(actualSession);
@@ -100,11 +99,11 @@ public class LobbyCollection {
         return true;
     }
 
-    private boolean alreadyInLobby(Session clientSession)
+    private boolean alreadyInLobby(String clientid)
     {
         for(Lobby lobby : lobbies)
         {
-            if(lobby.checkIfPlayerIsInHere(clientSession))
+            if(lobby.checkIfPlayerIsInHere(clientid))
             {
                 return true;
             }
