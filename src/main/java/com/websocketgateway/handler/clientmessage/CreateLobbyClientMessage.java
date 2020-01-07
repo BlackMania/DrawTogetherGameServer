@@ -1,6 +1,10 @@
 package com.websocketgateway.handler.clientmessage;
 
 import com.gamelogic.LobbyCollection;
+import com.websocketgateway.jsonbuilder.BuildType;
+import com.websocketgateway.jsonbuilder.JSONBuilderHandler;
+import com.websocketgateway.session.SessionCollection;
+import com.websocketgateway.utils.JSONMessageBuilderUtils;
 import org.json.JSONObject;
 
 import javax.websocket.Session;
@@ -9,37 +13,25 @@ import java.io.IOException;
 public class CreateLobbyClientMessage implements ClientMessageHandler {
 
     @Override
-    public JSONObject processMessage(JSONObject jsonObject, Session clientSession){
+    public JSONObject processMessage(JSONObject jsonObject, String clientid){
         LobbyCollection lobbies = LobbyCollection.getInstance();
-        JSONObject json = new JSONObject();
-        if(lobbies.createLobby(clientSession))
+        if(lobbies.createLobby(clientid))
         {
-            json.put("status", "successful");
+            return JSONBuilderHandler.buildJson(new String[]{lobbies.getLobbyIDLastGameSession()}, BuildType.CREATELOBBY);
         }
         else {
-            json.put("status", "error");
-            json.put("reason", "You are already in a lobby");
+            return JSONBuilderHandler.buildJson(new String[]{"You are already in a lobby"}, BuildType.ERRORJSON);
         }
-        return json;
     }
 
     @Override
-    public boolean updateMessage(Session clientSession, JSONObject responseData) {
+    public boolean updateMessage(String clientid, JSONObject responseData) {
         if(responseData != null)
         {
-            LobbyCollection lobbies = LobbyCollection.getInstance();
-            JSONObject clientResponse = new JSONObject();
-            if(responseData.getString("status").equals("successful"))
-            {
-                clientResponse.put("task", "joinGame");
-                clientResponse.put("gameSessionId", lobbies.getLobbyIDLastGameSession());
-            }
-            else
-            {
-                clientResponse.put("error", responseData.get("reason"));
-            }
+            SessionCollection collection = SessionCollection.getInstance();
+            Session clientSession = collection.getSessionByClientId(clientid);
             try {
-                clientSession.getBasicRemote().sendText(clientResponse.toString());
+                clientSession.getBasicRemote().sendText(responseData.toString());
                 return true;
             } catch (IOException e) {
                 e.printStackTrace();

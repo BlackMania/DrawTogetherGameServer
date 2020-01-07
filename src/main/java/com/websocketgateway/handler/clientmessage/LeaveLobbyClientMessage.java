@@ -3,6 +3,9 @@ package com.websocketgateway.handler.clientmessage;
 import com.gamelogic.Lobby;
 import com.gamelogic.LobbyCollection;
 import com.gamelogic.Player;
+import com.websocketgateway.jsonbuilder.BuildType;
+import com.websocketgateway.jsonbuilder.JSONBuilderHandler;
+import com.websocketgateway.session.SessionCollection;
 import org.json.JSONObject;
 
 import javax.websocket.Session;
@@ -11,53 +14,40 @@ import java.sql.Timestamp;
 
 public class LeaveLobbyClientMessage implements ClientMessageHandler {
     @Override
-    public JSONObject processMessage(JSONObject jsonObject, Session clientSession) {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+    public JSONObject processMessage(JSONObject jsonObject, String clientid) {
         LobbyCollection lobbies = LobbyCollection.getInstance();
-        JSONObject json = new JSONObject();
-        Lobby lobby = lobbies.getLobbyByClientSession(clientSession);
+        Lobby lobby = lobbies.getLobbyByClientId(clientid);
         if (lobby != null) {
-            json.put("status", "successful");
-            json.put("leftLobbyId", lobby.getLobbyId());
-            json.put("playerNickName", lobby.getPlayerBySession(clientSession).getNickname());
-            json.put("oldRoomMaster", lobby.getRoomMaster().getNickname());
-            lobbies.leaveLobby(clientSession);
-            json.put("newRoomMaster", lobby.getRoomMaster().getNickname());
-            System.out.printf("[Removed Client from Lobby] %s | %s | %s \n", clientSession.getId(), "Removing player from game lobby", timestamp.toString());
+            Player leftPlayer = lobby.getPlayerByClientId(clientid);
+            lobbies.leaveLobby(clientid);
+            return JSONBuilderHandler.buildJson(new String[]{leftPlayer.getNickname(), lobby.getRoomMaster().getNickname(), lobby.getLobbyId()}, BuildType.LEAVELOBBY);
         } else {
-            json.put("status", "error");
-            json.put("reason", "You can't leave, because you are not in a game lobby");
+            return JSONBuilderHandler.buildJson(new String[]{"You can't leave, because you are not in a game lobby"}, BuildType.ERRORJSON);
         }
-        return json;
     }
 
     @Override
-    public boolean updateMessage(Session clientSession, JSONObject responseData) {
+    public boolean updateMessage(String clientid, JSONObject responseData) {
         LobbyCollection lobbies = LobbyCollection.getInstance();
-        JSONObject clientResponse = new JSONObject();
-        if (responseData.getString("status").equals("successful")) {
-            Lobby lobby = lobbies.getLobbyByLobbyId(responseData.getString("leftLobbyId"));
+        Lobby lobby = lobbies.getLobbyByLobbyId(responseData.getString("leftLobbyId"));
+        if (!responseData.has("error")) {
             if (lobby != null) {
-                clientResponse.put("task", "removePlayer");
-                clientResponse.put("removedPlayer", responseData.getString("playerNickName"));
-                clientResponse.put("newRoomMaster", responseData.getString("newRoomMaster"));
-                try {
-                    for (Player player : lobby.getPlayers()) {
-                        if (player.getClientSession() != clientSession) {
-                            player.getClientSession().getBasicRemote().sendText(clientResponse.toString());
-                        }
+                for (Player player : lobby.getPlayers()) {
+                    SessionCollection collection = SessionCollection.getInstance();
+                    Session session = collection.getSessionByClientId(player.getClientid());
+                    try {
+                        session.getBasicRemote().sendText(responseData.toString());
+                    } catch (IOException exc) {
+                        exc.printStackTrace();
+                        return false;
                     }
-                } catch (IOException exc) {
-                    exc.printStackTrace();
-                    return false;
                 }
             }
-
         } else {
-            clientResponse.put("status", "error");
-            clientResponse.put("reason", responseData.getString("reason"));
+            SessionCollection collection = SessionCollection.getInstance();
+            Session session = collection.getSessionByClientId(clientid);
             try{
-                clientSession.getBasicRemote().sendText(clientResponse.toString());
+                session.getBasicRemote().sendText(responseData.toString());
             } catch (IOException exc) {
                 exc.printStackTrace();
                 return false;

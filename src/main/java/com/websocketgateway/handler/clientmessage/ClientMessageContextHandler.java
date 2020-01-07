@@ -22,9 +22,9 @@ public class ClientMessageContextHandler {
         messageHandlers.put(EMessage.GuessDrawing, new GuessDrawingClientMessage());
     }
 
-    public static boolean processMessage(EMessage taskname, JSONObject jsonObject, Session clientSession)
+    public static boolean processMessage(EMessage taskname, JSONObject jsonObject, String clientid)
     {
-        JSONObject response = messageHandlers.get(taskname).processMessage(jsonObject, clientSession);
-        return messageHandlers.get(taskname).updateMessage(clientSession, response);
+        JSONObject response = messageHandlers.get(taskname).processMessage(jsonObject, clientid);
+        return messageHandlers.get(taskname).updateMessage(clientid, response);
     }
 }
