@@ -18,14 +18,7 @@ public class APIHandler {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-        connection.setDoOutput(true);
-        JSONObject json = new JSONObject();
-        json.put("token", token);
-        try(OutputStream os = connection.getOutputStream()) {
-            byte[] input = json.toString().getBytes("utf-8");
-            os.write(input, 0, input.length);
-        }
-
+        connection.addRequestProperty("Authorization", "Bearer " + token);
         connection.connect();
         return connection;
     }

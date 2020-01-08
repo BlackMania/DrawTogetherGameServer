@@ -10,9 +10,13 @@ public class GetGamesBuilder implements JSONBuilderable {
         object.put("task", "updateGameList");
 
         JSONArray array = new JSONArray();
-        for(String lobbyid : params)
+        for(String lobby : params)
         {
-            array.put(lobbyid);
+            String[] lobbyInfo = lobby.split(",");
+            JSONObject lob = new JSONObject();
+            lob.put("lobbyId", lobbyInfo[0].replace("[", "").replace("]", ""));
+            lob.put("lobbyName", lobbyInfo[1].replace("[", "").replace("]", ""));
+            array.put(lob);
         }
         object.put("gameLobbys", array);
         return object;

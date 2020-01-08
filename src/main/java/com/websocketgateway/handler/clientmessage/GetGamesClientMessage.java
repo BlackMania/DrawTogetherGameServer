@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import javax.websocket.Session;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class GetGamesClientMessage implements ClientMessageHandler {
     @Override
@@ -18,7 +19,7 @@ public class GetGamesClientMessage implements ClientMessageHandler {
         String[] params = new String[lobbies.getLobbies().size()];
         for(int i = 0; i < lobbies.getLobbies().size(); i++)
         {
-            params[i] = lobbies.getLobbies().get(i).getLobbyId();
+            params[i] = Arrays.toString(new String[]{lobbies.getLobbies().get(i).getLobbyId(), lobbies.getLobbies().get(i).getLobbyname()});
         }
         return JSONBuilderHandler.buildJson(params, BuildType.GETGAMES);
     }
