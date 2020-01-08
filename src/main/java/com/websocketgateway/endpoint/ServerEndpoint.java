@@ -34,16 +34,10 @@ public class ServerEndpoint {
             else {
                 SessionCollection collection = SessionCollection.getInstance();
                 collection.addSession(clientSession, TokenUtils.getClientId(token));
+                clientSession.getBasicRemote().sendText("You successfully connected");
             }
         }
         catch(Exception exc)
-        {
-            exc.printStackTrace();
-        }
-        try{
-            clientSession.getBasicRemote().sendText("You successfully connected");
-        }
-        catch(IOException exc)
         {
             exc.printStackTrace();
         }
