@@ -10,6 +10,7 @@ import java.util.UUID;
 
 public class Lobby {
     private String sessionId;
+    private String lobbyname;
     private List<Player> players;
     private final int MAX_PLAYERS = 6;
     private Chat chat;
@@ -19,8 +20,9 @@ public class Lobby {
     private int rounds;
     private boolean roundIsRunning;
 
-    public Lobby() {
+    public Lobby(String lobbyname) {
         sessionId = UUID.randomUUID().toString();
+        this.lobbyname = lobbyname;
         players = new ArrayList<Player>();
         chat = new Chat();
         started = false;
@@ -50,6 +52,14 @@ public class Lobby {
             }
         }
         return null;
+    }
+
+    public String getLobbyname() {
+        return lobbyname;
+    }
+
+    public void setLobbyname(String lobbyname) {
+        this.lobbyname = lobbyname;
     }
 
     public int getRounds() {

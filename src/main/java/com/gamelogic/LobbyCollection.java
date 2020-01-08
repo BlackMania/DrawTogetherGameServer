@@ -50,13 +50,13 @@ public class LobbyCollection {
         return lobbies.get(lobbies.size() - 1).getLobbyId();
     }
 
-    public boolean createLobby(String clientid) {
+    public boolean createLobby(String clientid, String lobbyname) {
         if(alreadyInLobby(clientid))
         {
             return false;
         }
         else {
-            this.lobbies.add(new Lobby());
+            this.lobbies.add(new Lobby(lobbyname));
             return true;
         }
     }
