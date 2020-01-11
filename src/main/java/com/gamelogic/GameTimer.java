@@ -2,85 +2,53 @@ package com.gamelogic;
 
 import com.websocketgateway.handler.clientmessage.ClientMessageContextHandler;
 import com.websocketgateway.handler.clientmessage.EMessage;
-import com.websocketgateway.session.SessionCollection;
-import org.json.JSONArray;
+import com.websocketgateway.session.ClientNotifyer;
 import org.json.JSONObject;
 
-import javax.websocket.Session;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.TimerTask;
 
 public class GameTimer extends TimerTask {
 
-    int counter = 60;
+    private int counter = 60;
     private Lobby lobby;
-    private List<Session> clientSessions;
-    private SessionCollection collection;
 
     public GameTimer(Lobby lobby) {
         this.lobby = lobby;
-        clientSessions = new ArrayList<Session>();
-        collection = SessionCollection.getInstance();
-        for(Player player : lobby.getPlayers())
-        {
-            clientSessions.add(collection.getSessionByClientId(player.getClientid()));
-        }
     }
 
     @Override
     public void run() {
         JSONObject object = new JSONObject();
-        if(counter >= 0)
+        ClientNotifyer notifyer = new ClientNotifyer(lobby.getAllClientIds());
+        if(lobby.getPlayers().size() == 0)
         {
-            object.put("task", "updateTimer");
-            object.put("currentTime", counter);
-            for(Session clientSession : clientSessions)
-            {
-                try {
-                    clientSession.getBasicRemote().sendText(object.toString());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        else {
-            if(lobby.getRounds() > 0) {
-                lobby.roundEnd();
-                Player newDrawer = lobby.getAndSetRandomPlayerToDraw();
-                for (Session clientSession : clientSessions) {
-                    object = new JSONObject();
-                    object.put("drawer", newDrawer.getNickname());
-                    if (clientSession == collection.getSessionByClientId(newDrawer.getClientid())) {
-                        object.put("task", "chooseWord2");
-                    } else {
-                        object.put("task", "roundEnded");
-                    }
-
-                    try {
-                        clientSession.getBasicRemote().sendText(object.toString());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            else {
-                lobby.endGame();
-                object = new JSONObject();
-                object.put("task", "backToLobbyState");
-                for(Session clientSession : clientSessions)
-                {
-                    try{
-                        clientSession.getBasicRemote().sendText(object.toString());
-                    } catch(IOException e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-            }
             this.cancel();
         }
+        else if(counter < 0)
+        {
+            notifyer.notifyClients(ClientMessageContextHandler.processMessage(EMessage.EndRound, null, lobby.getAllClientIds()[0]));
+        }
+        else
+        {
+            object.put("task", "updateTimer");
+            object.put("time", counter);
+        }
+        if(lobby.checkAllPlayersGuessedWord())
+        {
+            notifyer.notifyClients(ClientMessageContextHandler.processMessage(EMessage.EndRound, null, lobby.getAllClientIds()[0]));
+        }
+        notifyer.notifyClients(object);
         counter--;
+    }
+
+    private void setNewDrawer()
+    {
+        lobby.setNewPlayerToDraw();
+    }
+
+    private String getDrawersName()
+    {
+        Player player = lobby.getDrawingPlayer();
+        return player.getNickname();
     }
 }

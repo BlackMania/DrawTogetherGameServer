@@ -1,12 +1,6 @@
 package com.gamelogic;
 
-import org.json.JSONObject;
-
-import javax.websocket.Session;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 public class Lobby {
     private String sessionId;
@@ -18,7 +12,8 @@ public class Lobby {
     private boolean started;
     private Player roomMaster;
     private int rounds;
-    private boolean roundIsRunning;
+    private boolean roundRunning;
+    private Timer timer;
 
     public Lobby(String lobbyname) {
         sessionId = UUID.randomUUID().toString();
@@ -27,10 +22,19 @@ public class Lobby {
         chat = new Chat();
         started = false;
         rounds = 3;
-        roundIsRunning = false;
+        roundRunning = false;
+        timer = new Timer();
     }
 
+
+
     //region getters and setters
+
+
+    public boolean isRoundRunning() {
+        return roundRunning;
+    }
+
     public String getLobbyId() {
         return sessionId;
     }
@@ -64,17 +68,6 @@ public class Lobby {
 
     public int getRounds() {
         return rounds;
-    }
-
-    public void startRound(Drawing drawing) {
-        this.drawing = drawing;
-        this.roundIsRunning = true;
-    }
-
-    public void roundEnd() {
-        this.roundIsRunning = false;
-        this.drawing = null;
-        this.rounds--;
     }
 
     public Player getRoomMaster() {
@@ -127,6 +120,20 @@ public class Lobby {
         }
     }
 
+    public void startRound(String drawing) {
+        this.drawing = new Drawing(drawing);
+        this.roundRunning = true;
+        startTimer();
+    }
+
+    public void roundEnd() {
+        stopTimer();
+        resetPlayerGuessedWord();
+        this.roundRunning = false;
+        this.drawing = null;
+        this.rounds--;
+    }
+
     public boolean isNotFull(){
         return players.size() != MAX_PLAYERS;
     }
@@ -143,13 +150,27 @@ public class Lobby {
         return false;
     }
 
-    public Player getAndSetRandomPlayerToDraw()
+    public void setNewPlayerToDraw()
     {
+        for(Player p : players)
+        {
+            p.setDrawer(false);
+        }
         Random randomGenerator = new Random();
         int randomInt = randomGenerator.nextInt(this.players.size());
         Player drawer = players.get(randomInt);
         drawer.setDrawer(true);
-        return drawer;
+    }
+
+    public Player getDrawingPlayer(){
+        for(Player player : players)
+        {
+            if(player.isDrawer())
+            {
+                return player;
+            }
+        }
+        return null;
     }
 
     public boolean checkIfClientIsDrawer(String clientid)
@@ -169,7 +190,8 @@ public class Lobby {
         this.drawing = null;
         this.rounds = 3;
         this.chat = new Chat();
-        this.roundIsRunning = false;
+        this.roundRunning = false;
+        stopTimer();
         // Update all collected data to database
     }
 
@@ -187,5 +209,43 @@ public class Lobby {
             }
         }
         return false;
+    }
+
+    public String[] getAllClientIds()
+    {
+        ArrayList<String> clientids = new ArrayList<>();
+        for(Player player : players)
+        {
+            clientids.add(player.getClientid());
+        }
+        return clientids.toArray(new String[0]);
+    }
+
+    public boolean checkAllPlayersGuessedWord(){
+        for(Player player : players)
+        {
+            if(player.isDrawer()) continue;
+            if(!player.getGuessedWord()) return false;
+        }
+        return true;
+    }
+
+    private void startTimer()
+    {
+        timer = new Timer();
+        timer.schedule(new GameTimer(this), 0, 1000);
+    }
+
+    private void stopTimer()
+    {
+        timer.cancel();
+        timer.purge();
+    }
+
+    private void resetPlayerGuessedWord() {
+        for(Player player : players)
+        {
+            player.setGuessedWord(false);
+        }
     }
 }

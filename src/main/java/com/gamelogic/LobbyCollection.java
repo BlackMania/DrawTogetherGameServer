@@ -85,6 +85,7 @@ public class LobbyCollection {
         return true;
     }
 
+
     public boolean leaveLobby(String clientid) {
         if(!alreadyInLobby(clientid)) return false;
         Lobby actualSession = getLobbyByClientId(clientid);

@@ -42,7 +42,7 @@ public class Player {
         return nickname;
     }
 
-    public boolean isGuessedWord() {
+    public boolean getGuessedWord() {
         return guessedWord;
     }
 
@@ -57,7 +57,14 @@ public class Player {
     public void setClientid(String clientid) {
         this.clientid = clientid;
     }
+
+
     //endregion
+
+    public void addPoints(int amount)
+    {
+        this.points += amount;
+    }
 
 
 }
