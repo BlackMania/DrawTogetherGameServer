@@ -10,5 +10,7 @@ public enum BuildType {
     SENDCOORDINATES,
     STARTGAME,
     SETWORD,
-    ERRORJSON
+    ERRORJSON,
+    ENDROUND,
+    ENDGAME
 }

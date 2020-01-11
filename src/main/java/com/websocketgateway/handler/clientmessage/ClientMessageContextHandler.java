@@ -2,7 +2,6 @@ package com.websocketgateway.handler.clientmessage;
 
 import org.json.JSONObject;
 
-import javax.websocket.Session;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,11 +19,11 @@ public class ClientMessageContextHandler {
         messageHandlers.put(EMessage.SetWord, new SetWordClientMessage());
         messageHandlers.put(EMessage.SendCoordinates, new SendCoordinatesClientMessage());
         messageHandlers.put(EMessage.GuessDrawing, new GuessDrawingClientMessage());
+        messageHandlers.put(EMessage.EndRound, new EndRoundClientMessage());
     }
 
-    public static boolean processMessage(EMessage taskname, JSONObject jsonObject, String clientid)
+    public static ClientResponsePair processMessage(EMessage taskname, JSONObject jsonObject, String clientid)
     {
-        JSONObject response = messageHandlers.get(taskname).processMessage(jsonObject, clientid);
-        return messageHandlers.get(taskname).updateMessage(clientid, response);
+        return messageHandlers.get(taskname).processMessage(jsonObject, clientid);
     }
 }

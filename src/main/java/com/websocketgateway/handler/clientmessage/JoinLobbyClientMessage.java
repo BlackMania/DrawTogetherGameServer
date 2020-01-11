@@ -15,7 +15,7 @@ import java.util.Arrays;
 
 public class JoinLobbyClientMessage implements ClientMessageHandler {
     @Override
-    public JSONObject processMessage(JSONObject jsonObject, String clientid){
+    public ClientResponsePair processMessage(JSONObject jsonObject, String clientid){
         LobbyCollection lobbies = LobbyCollection.getInstance();
         if(jsonObject.get("nickname") != null || jsonObject.get("gameSessionId") != null)
         {
@@ -28,44 +28,9 @@ public class JoinLobbyClientMessage implements ClientMessageHandler {
                 {
                     playernames[i] = lobby.getPlayers().get(i).getNickname();
                 }
-                return JSONBuilderHandler.buildJson(new String[]{Arrays.toString(playernames), lobby.getRoomMaster().getNickname()}, BuildType.JOINLOBBY);
+                return new ClientResponsePair(lobby.getAllClientIds(), JSONBuilderHandler.buildJson(new String[]{Arrays.toString(playernames), lobby.getRoomMaster().getNickname()}, BuildType.JOINLOBBY));
             }
         }
-        return JSONBuilderHandler.buildJson(new String[]{"Something went wrong joining the game"}, BuildType.ERRORJSON);
-    }
-
-    @Override
-    public boolean updateMessage(String clientid, JSONObject responseData) {
-        LobbyCollection lobbies = LobbyCollection.getInstance();
-        if(!responseData.has("error"))
-        {
-            Lobby lobby = lobbies.getLobbyByClientId(clientid);
-            for(Player player : lobby.getPlayers())
-            {
-                SessionCollection collection = SessionCollection.getInstance();
-                Session session = collection.getSessionByClientId(player.getClientid());
-                try{
-                    session.getBasicRemote().sendText(responseData.toString());
-                } catch(IOException exc)
-                {
-                    exc.printStackTrace();
-                    return false;
-                }
-            }
-        }
-        else
-        {
-            try{
-                SessionCollection collection = SessionCollection.getInstance();
-                Session session = collection.getSessionByClientId(clientid);
-                session.getBasicRemote().sendText(responseData.toString());
-            } catch(IOException exc)
-            {
-                exc.printStackTrace();
-                return false;
-            }
-        }
-
-        return true;
+        return new ClientResponsePair(new String[]{clientid}, JSONBuilderHandler.buildJson(new String[]{"Something went wrong joining the game"}, BuildType.ERRORJSON));
     }
 }

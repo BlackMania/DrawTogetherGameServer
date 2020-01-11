@@ -9,5 +9,6 @@ public enum EMessage {
     GetDrawWords,
     SetWord,
     SendCoordinates,
-    GuessDrawing
+    GuessDrawing,
+    EndRound
 }

@@ -12,7 +12,7 @@ public class JoinLobbyBuilder implements JSONBuilderable {
         String[] players = params[0].split(",");
         for(String name : players)
         {
-            array.put(name.replace("[", "").replace("]", ""));
+            array.put(name.replace("[", "").replace("]", "").trim());
         }
         object.put("roomMaster", params[1]);
         object.put("players", array);

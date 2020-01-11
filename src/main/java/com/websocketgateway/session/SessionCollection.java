@@ -25,7 +25,7 @@ public class SessionCollection {
         return sessions.get(clientid);
     }
 
-    public String getCLientIdBySession(Session session)
+    public String getClientIdBySession(Session session)
     {
         for(Map.Entry<String, Session> field : sessions.entrySet())
         {

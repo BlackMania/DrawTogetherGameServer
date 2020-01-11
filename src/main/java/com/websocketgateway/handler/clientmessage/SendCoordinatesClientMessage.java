@@ -14,7 +14,7 @@ import java.io.IOException;
 
 public class SendCoordinatesClientMessage implements ClientMessageHandler {
     @Override
-    public JSONObject processMessage(JSONObject jsonObject, String clientid) {
+    public ClientResponsePair processMessage(JSONObject jsonObject, String clientid) {
         LobbyCollection lobbies = LobbyCollection.getInstance();
         Lobby lobby = lobbies.getLobbyByClientId(clientid);
         int prevX = jsonObject.getInt("prevX");
@@ -33,29 +33,6 @@ public class SendCoordinatesClientMessage implements ClientMessageHandler {
         params[3] = Integer.toString(currY);
         params[4] = color;
         params[5] = Integer.toString(lineWidth);
-        return JSONBuilderHandler.buildJson(params, BuildType.SENDCOORDINATES);
-    }
-
-    @Override
-    public boolean updateMessage(String clientid, JSONObject responseData) {
-        LobbyCollection lobbies = LobbyCollection.getInstance();
-        Lobby lobby  = lobbies.getLobbyByClientId(clientid);
-        JSONObject clientResponse = responseData;
-        clientResponse.put("task", "addCoordinate");
-        for(Player player : lobby.getPlayers())
-        {
-            if(!player.getClientid().equals(clientid))
-            {
-                SessionCollection collection = SessionCollection.getInstance();
-                Session session = collection.getSessionByClientId(player.getClientid());
-                try {
-                    session.getBasicRemote().sendText(clientResponse.toString());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return false;
-                }
-            }
-        }
-        return true;
+        return new ClientResponsePair(lobby.getAllClientIds(), JSONBuilderHandler.buildJson(params, BuildType.SENDCOORDINATES));
     }
 }

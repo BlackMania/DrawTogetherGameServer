@@ -1,18 +1,16 @@
 package com.websocketgateway.endpoint;
 
-import com.gamelogic.Lobby;
-import com.gamelogic.Player;
-import com.gamelogic.LobbyCollection;
 import com.websocketgateway.handler.APIHandler;
 import com.websocketgateway.handler.clientmessage.ClientMessageContextHandler;
+import com.websocketgateway.handler.clientmessage.ClientResponsePair;
 import com.websocketgateway.handler.clientmessage.EMessage;
+import com.websocketgateway.session.ClientNotifyer;
 import com.websocketgateway.session.SessionCollection;
 import com.websocketgateway.utils.TokenUtils;
 import org.json.JSONObject;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.sql.Timestamp;
 
@@ -53,24 +51,32 @@ public class ServerEndpoint {
         }
         catch(Exception exc)
         {
-            System.out.printf("[Message error received] %s | %s | %s \n", clientSession.getId(), exc.getMessage(), timestamp.toString());
+            System.out.printf("[Error] %s | %s | %s \n", clientSession.getId(), exc.getMessage(), timestamp.toString());
         }
         if(json != null)
         {
             System.out.printf("[Processing Message] %s | Executing task: %s | %s \n", clientSession.getId(), json.get("task"), timestamp.toString());
             EMessage task = null;
+            ClientResponsePair response = null;
             try {
                 task = EMessage.valueOf(json.get("task").toString());
                 SessionCollection collection = SessionCollection.getInstance();
-                if(ClientMessageContextHandler.processMessage(task, json, collection.getCLientIdBySession(clientSession))){
-                    System.out.printf("[Message Processed] %s | Executing task: %s | %s \n", clientSession.getId(), json.get("task"), timestamp.toString());
-                } else throw new Exception("Something went wrong");
+                response = ClientMessageContextHandler.processMessage(task, json, collection.getClientIdBySession(clientSession));
+
             }
             catch (Exception exc)
             {
-                System.out.printf("[Error Processing Message] %s | %s | %s \n", clientSession.getId(), exc.getMessage(), timestamp.toString());
+                System.out.printf("[Error] %s | %s | %s \n", clientSession.getId(), exc.getMessage(), timestamp.toString());
+            }
+            System.out.printf("[Message Processed] %s | Executing task: %s | %s \n", clientSession.getId(), json.get("task"), timestamp.toString());
+            System.out.printf("[Updating Clients] %s | Executing task: %s | %s \n", clientSession.getId(), json.get("task"), timestamp.toString());
+            if(response != null)
+            {
+                ClientNotifyer notifyer = new ClientNotifyer(response.getUpdatableClientIDs());
+                notifyer.notifyClients(response.getResponse());
             }
         }
+
     }
 
     @OnClose
@@ -80,6 +86,12 @@ public class ServerEndpoint {
         // Needs fixing
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         SessionCollection collection = SessionCollection.getInstance();
+        ClientResponsePair pair = ClientMessageContextHandler.processMessage(EMessage.LeaveGame, null, collection.getClientIdBySession(clientSession));
+        if(!pair.getResponse().has("error"))
+        {
+            ClientNotifyer notifyer = new ClientNotifyer(pair.getUpdatableClientIDs());
+            notifyer.notifyClients(pair.getResponse());
+        }
         collection.removeSessionBySesion(clientSession);
         System.out.printf("[Connection closed] %s | %s | %s \n", clientSession.getId(), reason.getCloseCode() + " - " + reason.getReasonPhrase(), timestamp.toString());
     }

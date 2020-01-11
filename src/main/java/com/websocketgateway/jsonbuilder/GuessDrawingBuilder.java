@@ -10,6 +10,7 @@ public class GuessDrawingBuilder implements JSONBuilderable {
         object.put("correct", Boolean.parseBoolean(params[0]));
         object.put("message", params[1]);
         object.put("messager",params[2]);
+        object.put("uuid",params[3]);
         return object;
     }
 }

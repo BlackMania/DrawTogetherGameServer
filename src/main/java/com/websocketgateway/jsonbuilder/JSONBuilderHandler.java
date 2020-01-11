@@ -20,6 +20,8 @@ public class JSONBuilderHandler {
         builders.put(BuildType.SENDCOORDINATES, new SendCoordinatesBuilder());
         builders.put(BuildType.SETWORD, new SetWordBuilder());
         builders.put(BuildType.STARTGAME, new StartGameBuilder());
+        builders.put(BuildType.ENDROUND, new EndRoundBuilder());
+        builders.put(BuildType.ENDGAME, new EndGameBuilder());
     }
 
     public static JSONObject buildJson(String[] params, BuildType type)
