@@ -1,12 +1,13 @@
 package com.websocketgateway.endpoint;
 
 import com.websocketgateway.handler.APIHandler;
-import com.websocketgateway.handler.clientmessage.ClientMessageContextHandler;
-import com.websocketgateway.handler.clientmessage.ClientResponsePair;
-import com.websocketgateway.handler.clientmessage.EMessage;
+import com.gamelogic.handlers.ClientMessageContextHandler;
+import com.gamelogic.handlers.ClientResponsePair;
+import com.gamelogic.handlers.EMessage;
 import com.websocketgateway.session.ClientNotifyer;
 import com.websocketgateway.session.SessionCollection;
 import com.websocketgateway.utils.TokenUtils;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import javax.websocket.*;
@@ -17,6 +18,7 @@ import java.sql.Timestamp;
 @javax.websocket.server.ServerEndpoint(value="/lobby/{jwttoken}")
 public class ServerEndpoint {
 
+    private static final Logger logger = Logger.getLogger(ServerEndpoint.class);
     @OnOpen
     public void onOpen(Session clientSession, @PathParam("jwttoken") String token)
     {
@@ -37,7 +39,7 @@ public class ServerEndpoint {
         }
         catch(Exception exc)
         {
-            exc.printStackTrace();
+            logger.error(exc);
         }
     }
 
@@ -45,45 +47,23 @@ public class ServerEndpoint {
     public void onMessage(Session clientSession, String message) {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         System.out.printf("[Message received] %s | %s | %s \n", clientSession.getId(), message, timestamp.toString());
-        JSONObject json = null;
-        try{
-            json = new JSONObject(message);
+        try {
+            JSONObject json = new JSONObject(message);
+            EMessage task = EMessage.valueOf(json.get("task").toString());
+            ClientResponsePair response = ClientMessageContextHandler.processMessage(task, json,
+                    SessionCollection.getInstance().getClientIdBySession(clientSession));
+            ClientNotifyer notifyer = new ClientNotifyer(response.getUpdatableClientIDs());
+            notifyer.notifyClients(response.getResponse());
         }
         catch(Exception exc)
         {
-            System.out.printf("[Error] %s | %s | %s \n", clientSession.getId(), exc.getMessage(), timestamp.toString());
+            logger.error(exc);
         }
-        if(json != null)
-        {
-            System.out.printf("[Processing Message] %s | Executing task: %s | %s \n", clientSession.getId(), json.get("task"), timestamp.toString());
-            EMessage task = null;
-            ClientResponsePair response = null;
-            try {
-                task = EMessage.valueOf(json.get("task").toString());
-                SessionCollection collection = SessionCollection.getInstance();
-                response = ClientMessageContextHandler.processMessage(task, json, collection.getClientIdBySession(clientSession));
-
-            }
-            catch (Exception exc)
-            {
-                System.out.printf("[Error] %s | %s | %s \n", clientSession.getId(), exc.getMessage(), timestamp.toString());
-            }
-            System.out.printf("[Message Processed] %s | Executing task: %s | %s \n", clientSession.getId(), json.get("task"), timestamp.toString());
-            System.out.printf("[Updating Clients] %s | Executing task: %s | %s \n", clientSession.getId(), json.get("task"), timestamp.toString());
-            if(response != null)
-            {
-                ClientNotifyer notifyer = new ClientNotifyer(response.getUpdatableClientIDs());
-                notifyer.notifyClients(response.getResponse());
-            }
-        }
-
     }
 
     @OnClose
     public void onClose(Session clientSession, CloseReason reason)
     {
-        // TODO
-        // Needs fixing
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         SessionCollection collection = SessionCollection.getInstance();
         ClientResponsePair pair = ClientMessageContextHandler.processMessage(EMessage.LeaveGame, null, collection.getClientIdBySession(clientSession));
@@ -99,6 +79,6 @@ public class ServerEndpoint {
     @OnError
     public void onError(Throwable e)
     {
-        e.printStackTrace();
+        logger.error(e);
     }
 }

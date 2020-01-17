@@ -1,6 +1,7 @@
 package com.websocketgateway.session;
 
-import com.websocketgateway.handler.clientmessage.ClientResponsePair;
+import com.gamelogic.handlers.ClientResponsePair;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import javax.websocket.Session;
@@ -11,6 +12,7 @@ import java.util.List;
 public class ClientNotifyer {
     private List<Session> clientSessions;
     private SessionCollection collection;
+    private static final Logger logger = Logger.getLogger(ClientNotifyer.class);
 
     public ClientNotifyer(String[] clientids) {
         clientSessions = new ArrayList<Session>();
@@ -29,7 +31,7 @@ public class ClientNotifyer {
                 session.getBasicRemote().sendText(object.toString());
             } catch (IOException exc)
             {
-                exc.printStackTrace();
+                logger.error(exc);
             }
         }
     }
@@ -47,7 +49,7 @@ public class ClientNotifyer {
                 session.getBasicRemote().sendText(object.getResponse().toString());
             } catch (IOException exc)
             {
-                exc.printStackTrace();
+                logger.error(exc);
             }
         }
     }

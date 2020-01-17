@@ -84,7 +84,7 @@ public class SessionCollectionTests {
 
         collection.addSession(session, clientid);
 
-        String result = collection.getCLientIdBySession(session);
+        String result = collection.getClientIdBySession(session);
 
         Assert.assertEquals("550e8400-e29b-41d4-a716-446655440000", result);
         collection.removeSessionBySesion(null);
