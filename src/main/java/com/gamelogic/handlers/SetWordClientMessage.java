@@ -11,8 +11,8 @@ public class SetWordClientMessage implements ClientMessageHandler {
     public ClientResponsePair processMessage(JSONObject jsonObject, String clientid) {
         LobbyCollection lobbies = LobbyCollection.getInstance();
         Lobby lobby = lobbies.getLobbyByClientId(clientid);
-        if (lobby != null && lobby.checkIfClientIsDrawer(clientid)) {
-            lobby.startRound(jsonObject.getString("word"));
+        if (lobby != null && lobby.getGame().checkIfClientIsDrawer(clientid)) {
+            lobby.getGame().startRound(jsonObject.getString("word"));
             return new ClientResponsePair(lobby.getAllClientIds(), JSONBuilderHandler.buildJson(new String[]{jsonObject.getString("word")}, BuildType.SETWORD));
         }
         return new ClientResponsePair(new String[]{clientid}, JSONBuilderHandler.buildJson(new String[]{"Player is not in a lobby or you are not the drawer"}, BuildType.ERRORJSON));

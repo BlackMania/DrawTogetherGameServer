@@ -19,13 +19,12 @@ public class StartGameClientMessage implements ClientMessageHandler {
         if (!lobby.getRoomMaster().getClientid().equals(clientid)) {
             return new ClientResponsePair(new String[]{clientid}, JSONBuilderHandler.buildJson(new String[]{"You are not the roommaster. Only the roommaster can start the game"}, BuildType.ERRORJSON));
         }
-        if (lobby.isStarted()) {
+        if (lobby.getGame().isStarted()) {
             return new ClientResponsePair(new String[]{clientid}, JSONBuilderHandler.buildJson(new String[]{"The game already started"}, BuildType.ERRORJSON));
         }
-        lobby.setStarted(true);
+        lobby.getGame().startGame();
         String[] params = new String[2];
-        lobby.setNewPlayerToDraw();
-        params[0] = lobby.getDrawingPlayer().getNickname();
+        params[0] = lobby.getGame().getDrawingPlayer().getNickname();
 
         JSONArray array = new JSONArray();
         for (Player player : lobby.getPlayers()) {

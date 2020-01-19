@@ -1,0 +1,9 @@
+language: java
+sudo: false
+install: true
+addons:
+  sonarcloud:
+    organization: "blackmania"
+    token: "5e3d4717fd8413e5775dd5fcef6ec37a4edfcacd"
+script:
+  - mvn clean install sonar:sonar -Pcoverage -Dsonar.projectKey=BlackMania_DrawTogetherGameServer

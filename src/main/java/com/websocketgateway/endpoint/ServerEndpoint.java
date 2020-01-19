@@ -1,6 +1,6 @@
 package com.websocketgateway.endpoint;
 
-import com.websocketgateway.handler.APIHandler;
+import com.apihandler.TokenAuthAPI;
 import com.gamelogic.handlers.ClientMessageContextHandler;
 import com.gamelogic.handlers.ClientResponsePair;
 import com.gamelogic.handlers.EMessage;
@@ -25,8 +25,8 @@ public class ServerEndpoint {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         System.out.printf("[Connection opened] Session id: %s | Token used: %s | %s \n", clientSession.getId(), token, timestamp.toString());
         try {
-            APIHandler handler = new APIHandler("http://localhost:9091/api/auth/tokenauth");
-            int response = handler.verifyUserToken(token).getResponseCode();
+            TokenAuthAPI tokenAuth = new TokenAuthAPI();
+            int response = tokenAuth.verifyUserToken(token);
             if(response != HttpURLConnection.HTTP_OK)
             {
                 clientSession.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT,  String.format("Couldn't accept token. Responsecode: %s", response)));

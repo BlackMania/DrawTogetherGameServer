@@ -20,11 +20,11 @@ public class GameTimer extends TimerTask {
     public void run() {
         JSONObject object = new JSONObject();
         ClientNotifyer notifyer = new ClientNotifyer(lobby.getAllClientIds());
-        if(lobby.getPlayers().size() == 0)
+        if(lobby.getPlayers().isEmpty() || lobby == null)
         {
             this.cancel();
         }
-        else if(counter < 0)
+        else if(counter < 0 || lobby.getGame().checkAllPlayersGuessedWord())
         {
             notifyer.notifyClients(ClientMessageContextHandler.processMessage(EMessage.EndRound, null, lobby.getAllClientIds()[0]));
         }
@@ -33,22 +33,7 @@ public class GameTimer extends TimerTask {
             object.put("task", "updateTimer");
             object.put("time", counter);
         }
-        if(lobby.checkAllPlayersGuessedWord())
-        {
-            notifyer.notifyClients(ClientMessageContextHandler.processMessage(EMessage.EndRound, null, lobby.getAllClientIds()[0]));
-        }
         notifyer.notifyClients(object);
         counter--;
-    }
-
-    private void setNewDrawer()
-    {
-        lobby.setNewPlayerToDraw();
-    }
-
-    private String getDrawersName()
-    {
-        Player player = lobby.getDrawingPlayer();
-        return player.getNickname();
     }
 }

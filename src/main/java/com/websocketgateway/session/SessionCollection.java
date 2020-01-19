@@ -58,7 +58,7 @@ public class SessionCollection {
         sessions.put(clientid, session);
     }
 
-    public int getCount()
+    int getCount()
     {
         return sessions.size();
     }

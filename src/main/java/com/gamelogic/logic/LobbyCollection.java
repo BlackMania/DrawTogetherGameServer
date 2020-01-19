@@ -63,7 +63,7 @@ public class LobbyCollection {
         }
         if(lobbyToJoin != null)
         {
-            if(lobbyToJoin.isStarted()) return false;
+            if(lobbyToJoin.getGame().isStarted()) return false;
             if(lobbyToJoin.isNotFull())
             {
                 lobbyToJoin.addPlayer(player);

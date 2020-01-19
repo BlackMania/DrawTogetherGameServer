@@ -14,13 +14,12 @@ public class EndRoundClientMessage implements ClientMessageHandler {
     public ClientResponsePair processMessage(JSONObject jsonObject, String clientid) {
 
         Lobby lobby = LobbyCollection.getInstance().getLobbyByClientId(clientid);
-        if (lobby.getRounds() <= 0) {
-            lobby.endGame();
+        if (lobby.getGame().getRounds() <= 0) {
+            lobby.getGame().endGame();
             return new ClientResponsePair(lobby.getAllClientIds(), JSONBuilderHandler.buildJson(null, BuildType.ENDGAME));
         }
 
-        lobby.setNewPlayerToDraw();
-        lobby.roundEnd();
+        lobby.getGame().roundEnd();
         JSONArray array = new JSONArray();
 
         for (Player p : lobby.getPlayers()) {
@@ -29,6 +28,6 @@ public class EndRoundClientMessage implements ClientMessageHandler {
             data.put("points", p.getPoints());
             array.put(data);
         }
-        return new ClientResponsePair(lobby.getAllClientIds(), JSONBuilderHandler.buildJson(new String[]{array.toString(), lobby.getDrawingPlayer().getNickname()}, BuildType.ENDROUND));
+        return new ClientResponsePair(lobby.getAllClientIds(), JSONBuilderHandler.buildJson(new String[]{array.toString(), lobby.getGame().getDrawingPlayer().getNickname()}, BuildType.ENDROUND));
     }
 }

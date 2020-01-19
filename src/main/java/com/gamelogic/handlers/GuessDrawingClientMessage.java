@@ -22,8 +22,8 @@ public class GuessDrawingClientMessage implements ClientMessageHandler {
             Player player = lobby.getPlayerByClientId(clientid);
             lobby.getChat().addChatMessage(new ChatMessage(timestamp, content, player));
             String[] params;
-            if (lobby.isRoundRunning() && lobby.getDrawingPlayer() != lobby.getPlayerByClientId(clientid)) {
-                if (lobby.checkWordGuess(content)) {
+            if (lobby.getGame().isRoundRunning() && lobby.getGame().getDrawingPlayer() != lobby.getPlayerByClientId(clientid)) {
+                if (lobby.getGame().checkWordGuess(content)) {
                     player.setGuessedWord(true);
                     player.addPoints(jsonObject.getInt("time"));
                     params = new String[]{"true", "guessed the word correctly!", lobby.getPlayerByClientId(clientid).getNickname(), jsonObject.getString("uuid")};

@@ -1,6 +1,6 @@
 package com.gamelogic.logic;
 
-public class DrawCoordinates {
+public class DrawCoordinate {
     private int currX;
     private int currY;
     private int prevX;
@@ -8,7 +8,7 @@ public class DrawCoordinates {
     private String color;
     private int lineWidth;
 
-    public DrawCoordinates(int currX, int currY, int prevX, int prevY, String color, int lineWidth)
+    public DrawCoordinate(int currX, int currY, int prevX, int prevY, String color, int lineWidth)
     {
         this.currX = currX;
         this.currY = currY;
